@@ -1,5 +1,6 @@
 using BankingSystem.Data;
 using BankingSystem.Interface;
+using BankingSystem.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,8 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IBankAccDBContext, BankAccDBContext>();
-
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
