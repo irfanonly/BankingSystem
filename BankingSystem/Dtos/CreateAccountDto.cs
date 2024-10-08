@@ -5,7 +5,7 @@ namespace BankingSystem.Dtos
     public class CreateAccountDto
     {
         [Required]
-        public string AccountType { get; set; }
+        public int AccountTypeId { get; set; }
         [Required]
         public string AccountName { get; set; }
     }

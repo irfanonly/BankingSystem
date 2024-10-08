@@ -67,7 +67,7 @@ namespace BankingSystem.Migrations
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AccountTypeId = table.Column<int>(type: "int", nullable: false),
                     IsClosed = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -82,8 +82,7 @@ namespace BankingSystem.Migrations
                         name: "FK_Accounts_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -110,15 +109,14 @@ namespace BankingSystem.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TrnType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TrnMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TrnById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TrnOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    TrnOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -127,7 +125,8 @@ namespace BankingSystem.Migrations
                         name: "FK_Transactions_Accounts_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Accounts",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Transactions_Users_TrnById",
                         column: x => x.TrnById,
@@ -140,8 +139,8 @@ namespace BankingSystem.Migrations
                 columns: new[] { "Id", "CreatedOn", "IsDeleted", "Name", "UpdatedOn" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7486), true, "Savings", new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7496) },
-                    { 2, new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7498), true, "Checking", new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7499) }
+                    { 1, new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3780), false, "Savings", new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3782) },
+                    { 2, new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3784), false, "Checking", new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3784) }
                 });
 
             migrationBuilder.CreateIndex(

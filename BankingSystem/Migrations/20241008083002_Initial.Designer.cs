@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingSystem.Migrations
 {
     [DbContext(typeof(BankAccDBContext))]
-    [Migration("20241008051510_Initial")]
+    [Migration("20241008083002_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -44,7 +44,7 @@ namespace BankingSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -85,18 +85,18 @@ namespace BankingSystem.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedOn = new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7486),
-                            IsDeleted = true,
+                            CreatedOn = new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3780),
+                            IsDeleted = false,
                             Name = "Savings",
-                            UpdatedOn = new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7496)
+                            UpdatedOn = new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3782)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedOn = new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7498),
-                            IsDeleted = true,
+                            CreatedOn = new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3784),
+                            IsDeleted = false,
                             Name = "Checking",
-                            UpdatedOn = new DateTime(2024, 10, 8, 9, 15, 10, 53, DateTimeKind.Local).AddTicks(7499)
+                            UpdatedOn = new DateTime(2024, 10, 8, 8, 30, 2, 556, DateTimeKind.Utc).AddTicks(3784)
                         });
                 });
 
@@ -126,16 +126,13 @@ namespace BankingSystem.Migrations
 
             modelBuilder.Entity("BankingSystem.Data.Transaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<Guid>("AccID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AccountId")
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
@@ -220,9 +217,7 @@ namespace BankingSystem.Migrations
 
                     b.HasOne("BankingSystem.Data.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("AccountType");
 
@@ -240,13 +235,17 @@ namespace BankingSystem.Migrations
 
             modelBuilder.Entity("BankingSystem.Data.Transaction", b =>
                 {
-                    b.HasOne("BankingSystem.Data.Account", null)
+                    b.HasOne("BankingSystem.Data.Account", "Account")
                         .WithMany("Transactions")
-                        .HasForeignKey("AccountId");
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BankingSystem.Data.User", "TrnBy")
                         .WithMany()
                         .HasForeignKey("TrnById");
+
+                    b.Navigation("Account");
 
                     b.Navigation("TrnBy");
                 });
