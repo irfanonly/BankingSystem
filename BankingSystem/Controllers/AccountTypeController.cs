@@ -16,6 +16,7 @@ namespace BankingSystem.Controllers
             _accountTypeService = accountTypeService;
         }
 
+        // POST: api/AccountType
         [HttpPost]
         public async Task<IActionResult> Create(CreateAccountTypeDto account)
         {
