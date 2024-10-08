@@ -12,15 +12,6 @@ namespace BankingSystem.Data
         public string Role { get; set; } // Admin or Customer
     }
 
-    public class AccountType
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public bool IsDeleted { get; set; } = true;
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
-        public DateTime UpdatedOn { get; set; } = DateTime.Now;
-    }
-
     public class Account
     {
         public Guid Id { get; set; }

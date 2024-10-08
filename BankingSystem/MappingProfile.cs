@@ -8,5 +8,8 @@ public class MappingProfile : Profile
     {
         CreateMap<CreateAccountDto, Account>();
         CreateMap<Account, CreateAccountDto>();
+
+        CreateMap<CreateAccountTypeDto, AccountType>();
+        //CreateMap<GetAccountTypeDto, AccountType>();
     }
 }
