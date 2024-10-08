@@ -35,13 +35,28 @@ namespace BankingSystem.Controllers
         [Route("view")]
         public async Task<IActionResult> View(Guid Id)
         {
-            var account = await _accountService.GetAsync(Id);
+            var account = await _accountService.GetDtoAsync(Id);
             if (account == null)
             {
                 return NotFound();
             }
 
             return Ok(account);
+        }
+
+
+        [HttpPut("close/{Id}")]
+        public async Task<IActionResult> Close(Guid Id)
+        {
+            var account = await _accountService.GetAsync(Id);
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            await _accountService.CloseAsync(account);
+
+            return NoContent();
         }
     }
 }

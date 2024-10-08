@@ -16,6 +16,18 @@ namespace BankingSystem.Services
             _db = db;
             _mapper = mapper;
         }
+
+        public async Task CloseAsync(Account account)
+        {
+
+            //TODO: 
+            account.IsClosed = true;
+            await _db.SaveChangesAsync();
+
+        }
+
+
+
         public async Task<Guid> CreateAsync(CreateAccountDto account)
         {
             var newAccount = _mapper.Map<Account>(account);
@@ -24,7 +36,7 @@ namespace BankingSystem.Services
             return newAccount.Id;
         }
 
-        public async Task<AccountDto?> GetAsync(Guid id)
+        public async Task<AccountDto?> GetDtoAsync(Guid id)
         {
             var account =  await _db.Accounts.Include(x => x.Transactions).Include(x => x.AccountType).FirstOrDefaultAsync(x => x.Id == id);
 
@@ -48,5 +60,12 @@ namespace BankingSystem.Services
             
 
         }
+
+        public async Task<Account?> GetAsync(Guid id)
+        {
+            return await _db.Accounts.FindAsync( id);
+        }
+
+        
     }
 }
