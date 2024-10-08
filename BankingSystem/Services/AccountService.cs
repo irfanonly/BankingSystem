@@ -20,9 +20,32 @@ namespace BankingSystem.Services
         public async Task CloseAsync(Account account)
         {
 
-            //TODO: 
-            account.IsClosed = true;
-            await _db.SaveChangesAsync();
+            using (var transaction = _db.Database.BeginTransaction()) {
+
+                try
+                {
+                    account.IsClosed = true;
+
+                    var closed = new ClosedAccount
+                    {
+                        AccountId = account.Id,
+                        ClosedOn = DateTime.UtcNow,
+                    };
+
+                    await _db.ClosedAccounts.AddAsync(closed);
+
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                
+
+            }
+            
 
         }
 
