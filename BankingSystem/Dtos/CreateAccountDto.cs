@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BankingSystem.Constants;
+using BankingSystem.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace BankingSystem.Dtos
 {
