@@ -20,7 +20,7 @@ namespace BankingSystem.Interface
         public DbSet<Account> Accounts { get; set; }
         public DbSet<ClosedAccount> ClosedAccounts { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<Transfer> Transfers { get; set; }
+        //public DbSet<Transfer> Transfers { get; set; }
 
 
 

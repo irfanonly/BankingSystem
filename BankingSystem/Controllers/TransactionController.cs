@@ -73,11 +73,11 @@ namespace BankingSystem.Controllers
                 return NotFound("From Account Not Found");
             }
 
-            var toAccount = await _accountService.GetAsync(transferDto.ToAccountId);
-            if (toAccount == null)
-            {
-                return NotFound("To Account Not Found");
-            }
+            //var toAccount = await _accountService.GetAsync(transferDto.ToAccountId);
+            //if (toAccount == null)
+            //{
+            //    return NotFound("To Account Not Found");
+            //}
 
             await _transactionService.TransferAsync(transferDto);
 

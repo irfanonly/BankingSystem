@@ -2,6 +2,7 @@
 using BankingSystem.Data;
 using BankingSystem.Dtos;
 using BankingSystem.Interface;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankingSystem.Services
@@ -20,18 +21,88 @@ namespace BankingSystem.Services
             {
                 try
                 {
-                    var account = await _db.Accounts.Include(x => x.Transactions).FirstOrDefaultAsync(x => x.Id == depositWithdrawalDto.AccountId);
+                    var account = await GetAccount(depositWithdrawalDto.AccountId);
 
-                    account!.Balance += depositWithdrawalDto.Amount;
+                    AddCredit(account, depositWithdrawalDto.Amount, TransactionMethod.Deposit);
+                    
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
 
-                    account.Transactions.Add(new Transaction
+            }
+        }
+
+        private void AmountLimitCheck(Account account, decimal amount)
+        {
+            if (account.AccountType.Name == AccountType.Checking
+                        && account.Balance + account.OverDraftLimit < amount)
+            {
+                throw new Exception("The OverDraftLimit is exceeded.");
+            }
+            else if (account.AccountType.Name != AccountType.Checking
+                        && account.Balance < amount)
+            {
+                throw new Exception("The withdrawal amount cannot be greater than your balance on your account");
+
+            }
+        }
+
+        private void AddCredit(Account account, decimal amount, string TrnMethod)
+        {
+            account!.Balance += amount;
+
+            account.Transactions.Add(new Transaction
+            {
+                Amount = amount,
+                TrnMethod = TrnMethod,
+                TrnType = TransactionType.Credit,
+                TrnOn = DateTime.UtcNow
+
+            });
+        }
+
+        private void AddDebit(Account account , decimal amount, string TrnMethod)
+        {
+            account!.Balance -= amount;
+
+            account.Transactions.Add(new Transaction
+            {
+                Amount = amount,
+                TrnMethod = TrnMethod,
+                TrnType = TransactionType.Debit,
+                TrnOn = DateTime.UtcNow
+
+            });
+        }
+
+        public async Task TransferAsync(TransferDto transferDto)
+        {
+            using (var transaction = _db.Database.BeginTransaction())
+            {
+                try
+                {
+                    var fromAccount = await GetAccount(transferDto.FromAccountId);
+
+                    var total = transferDto.ToAccounts.Sum(x => x.Amount);
+
+                    AmountLimitCheck(fromAccount, total);
+
+                    AddDebit(fromAccount, total , TransactionMethod.Transfer );
+
+                    foreach (var transferTo in transferDto.ToAccounts)
                     {
-                        Amount = depositWithdrawalDto.Amount,
-                        TrnMethod = TransactionMethod.Deposit,
-                        TrnType = TransactionType.Credit,
-                        TrnOn = DateTime.UtcNow
-                        
-                    });
+                        var toAccount = await GetAccount(transferTo.Id);
+                        if (toAccount == null)
+                        {
+                            throw new Exception($"The Account not found, account id:{transferTo.Id}");
+                        }
+                        AddCredit(toAccount, transferTo.Amount, TransactionMethod.Transfer );
+                    }
 
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -45,43 +116,23 @@ namespace BankingSystem.Services
             }
         }
 
-        public Task TransferAsync(TransferDto transferDto)
+        private async Task<Account?> GetAccount(Guid Id)
         {
-            throw new NotImplementedException();
+            return await _db.Accounts.Include(x => x.Transactions)
+                        .Include(x => x.AccountType)
+                        .FirstOrDefaultAsync(x => x.Id == Id);
         }
-
         public async Task WithdrawalAsync(DepositWithdrawalDto depositWithdrawalDto)
         {
             using (var transaction = _db.Database.BeginTransaction())
             {
                 try
                 {
-                    var account = await _db.Accounts.Include(x => x.Transactions)
-                        .Include(x => x.AccountType)
-                        .FirstOrDefaultAsync(x => x.Id == depositWithdrawalDto.AccountId);
+                    var account = await GetAccount(depositWithdrawalDto.AccountId);
 
-                    if (account.AccountType.Name == AccountType.Checking 
-                        && account.Balance + account.OverDraftLimit < depositWithdrawalDto.Amount)
-                    {
-                        throw new Exception("The OverDraftLimit is exceeded.");
-                    }
-                    else if(account.AccountType.Name != AccountType.Checking 
-                        && account.Balance < depositWithdrawalDto.Amount)
-                    {
-                        throw new Exception("The withdrawal amount cannot be greater than your balance on your account");
+                    AmountLimitCheck(account, depositWithdrawalDto.Amount);
 
-                    }
-
-                    account!.Balance -= depositWithdrawalDto.Amount;
-
-                    account.Transactions.Add(new Transaction
-                    {
-                        Amount = depositWithdrawalDto.Amount,
-                        TrnMethod = TransactionMethod.Withdrawal,
-                        TrnType = TransactionType.Debit,
-                        TrnOn = DateTime.UtcNow
-
-                    });
+                    AddDebit(account, depositWithdrawalDto.Amount, TransactionMethod.Withdrawal);
 
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
