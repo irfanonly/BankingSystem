@@ -19,7 +19,7 @@ namespace BankingSystem.Services
             var newAccount = _mapper.Map<Account>(account);
             _db.Accounts.Add(newAccount);
             await _db.SaveChangesAsync();
-            return newAccount.AccountId;
+            return newAccount.Id;
         }
     }
 }
