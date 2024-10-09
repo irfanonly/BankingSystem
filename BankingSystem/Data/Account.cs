@@ -1,4 +1,6 @@
-﻿namespace BankingSystem.Data
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BankingSystem.Data
 {
 
     public class Account
@@ -13,5 +15,8 @@
         public bool IsClosed { get; set; }
         public Guid? UserId { get; set; }
         public virtual User? User { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }
