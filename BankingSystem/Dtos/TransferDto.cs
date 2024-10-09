@@ -11,6 +11,10 @@ namespace BankingSystem.Dtos
 
         public string? Remarks { get; set; }
 
+        public override string ToString()
+        {
+            return $"FromAccountId:{FromAccountId},Remarks:{Remarks},ToAccounts:{string.Join(",", ToAccounts?.Select(x => x.ToString()))}";
+        }
     }
 
 }

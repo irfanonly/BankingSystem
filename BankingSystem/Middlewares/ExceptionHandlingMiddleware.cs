@@ -23,11 +23,13 @@ namespace BankingSystem.Middlewares
             catch (BadRequestException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                _logger.LogError(ex.Message);
                 await context.Response.WriteAsJsonAsync(new { message = ex.Message });
             }
             catch (NotFoundException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
+                _logger.LogError(ex.Message);
                 await context.Response.WriteAsJsonAsync(new { message = ex.Message });
             }
             catch(DBConcurrencyException ex)

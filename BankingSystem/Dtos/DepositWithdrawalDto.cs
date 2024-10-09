@@ -9,6 +9,11 @@ namespace BankingSystem.Dtos
         [Range(0.01, (double)decimal.MaxValue)]
         [Required]
         public decimal Amount { get; set; }
+
+        public override string ToString()
+        {
+            return $"AccountId:{AccountId},Amount:{Amount}";
+        }
     }
 
 }
