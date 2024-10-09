@@ -12,7 +12,7 @@ To set up and run the application, follow these steps:
 1. **Restore the .NET Packages**
    ```bash
    dotnet restore
-   ```bash
+
 2. **Update Connection String**
 Open the app configuration file (e.g., appsettings.json).
 Replace the existing connection string with the one pointing to your database.
@@ -22,7 +22,7 @@ Replace the existing connection string with the one pointing to your database.
 Run the following command to update the database:
 ```bash
 update-database
-```bash
+
 The necessary account types and some sample accounts will be seeded automatically for testing.
 
 ## To-Do List
