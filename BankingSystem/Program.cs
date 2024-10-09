@@ -1,5 +1,6 @@
 using BankingSystem.Data;
 using BankingSystem.Interface;
+using BankingSystem.Middlewares;
 using BankingSystem.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Exception Middleware to handle the exceptions
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

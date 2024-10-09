@@ -22,15 +22,15 @@ namespace BankingSystem.Controllers
         public async Task<IActionResult> Deposit(DepositWithdrawalDto depositWithdrawalDto)
         {
             if (ModelState.IsValid) {
-                var account = await _accountService.GetAsync(depositWithdrawalDto.AccountId);
-                if (account == null)
-                {
-                    return NotFound();
-                }
-                if (account.IsClosed)
-                {
-                    return BadRequest("The account is closed");
-                }
+                //var account = await _accountService.GetAsync(depositWithdrawalDto.AccountId);
+                //if (account == null)
+                //{
+                //    return NotFound();
+                //}
+                //if (account.IsClosed)
+                //{
+                //    return BadRequest("The account is closed");
+                //}
 
                 await _transactionService.DepositAsync(depositWithdrawalDto);
 
@@ -46,16 +46,20 @@ namespace BankingSystem.Controllers
         [Route("withdrawal")]
         public async Task<IActionResult> Withdrawal(DepositWithdrawalDto depositWithdrawalDto)
         {
-            var account = await _accountService.GetAsync(depositWithdrawalDto.AccountId);
-            if (account == null)
-            {
-                return NotFound();
+            if (!ModelState.IsValid) { 
+                return BadRequest();
             }
 
-            if (account.IsClosed)
-            {
-                return BadRequest("The account is closed");
-            }
+            //var account = await _accountService.GetAsync(depositWithdrawalDto.AccountId);
+            //if (account == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //if (account.IsClosed)
+            //{
+            //    return BadRequest("The account is closed");
+            //}
            
             await _transactionService.WithdrawalAsync(depositWithdrawalDto);
 
@@ -66,22 +70,16 @@ namespace BankingSystem.Controllers
         [Route("transfer")]
         public async Task<IActionResult> Transfer(TransferDto transferDto)
         {
-            var fromAccount = await _accountService.GetAsync(transferDto.FromAccountId);
-            
-            if (fromAccount == null)
+
+            if (ModelState.IsValid)
             {
-                return NotFound("From Account Not Found");
+                await _transactionService.TransferAsync(transferDto);
+
+                return NoContent();
             }
 
-            //var toAccount = await _accountService.GetAsync(transferDto.ToAccountId);
-            //if (toAccount == null)
-            //{
-            //    return NotFound("To Account Not Found");
-            //}
-
-            await _transactionService.TransferAsync(transferDto);
-
-            return NoContent();
+            return BadRequest();
+            
         }
     }
 }

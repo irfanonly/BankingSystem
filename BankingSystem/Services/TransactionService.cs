@@ -1,6 +1,7 @@
 ﻿using BankingSystem.Constants;
 using BankingSystem.Data;
 using BankingSystem.Dtos;
+using BankingSystem.Exceptions;
 using BankingSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,19 @@ namespace BankingSystem.Services
             _db = db;
         }
 
+        private void ValidateAccount(Account? account, Guid id)
+        {
+            if (account == null)
+            {
+                throw new NotFoundException($"The account is not found for the transaction, account id: {id}");
+            }
+
+            if (account.IsClosed)
+            {
+                throw new BadRequestException($"The account status is closed");
+            }
+        }
+
         public async Task DepositAsync(DepositWithdrawalDto depositWithdrawalDto)
         {
             using (var transaction = _db.Database.BeginTransaction())
@@ -22,6 +36,8 @@ namespace BankingSystem.Services
                 try
                 {
                     var account = await GetAccount(depositWithdrawalDto.AccountId);
+
+                    ValidateAccount(account, depositWithdrawalDto.AccountId);
 
                     AddCredit(account, depositWithdrawalDto.Amount);
 
@@ -51,12 +67,12 @@ namespace BankingSystem.Services
             if (account.AccountType.Name == AccountType.Checking
                         && account.Balance + account.OverDraftLimit < amount)
             {
-                throw new Exception("The OverDraftLimit is exceeded.");
+                throw new BadRequestException("The OverDraftLimit is exceeded.");
             }
             else if (account.AccountType.Name != AccountType.Checking
                         && account.Balance < amount)
             {
-                throw new Exception("The withdrawal amount cannot be greater than your balance on your account");
+                throw new BadRequestException("The withdrawal amount cannot be greater than your balance on your account");
 
             }
         }
@@ -82,11 +98,13 @@ namespace BankingSystem.Services
 
                     var fromAccount = await GetAccount(transferDto.FromAccountId);
 
+                    ValidateAccount(fromAccount, transferDto.FromAccountId);
+
                     var total = transferDto.ToAccounts.Sum(x => x.Amount);
 
-                    AmountLimitCheck(fromAccount, total);
+                    AmountLimitCheck(fromAccount!, total);
 
-                    AddDebit(fromAccount, total);
+                    AddDebit(fromAccount!, total);
 
                     var trn = new Transaction
                     {
@@ -97,22 +115,18 @@ namespace BankingSystem.Services
 
                     };
 
-                    fromAccount.Transactions.Add(trn);
+                    fromAccount!.Transactions.Add(trn);
 
                     var transfer = new Transfer { Remarks = transferDto.Remarks };
                     
-
-                    
-
                     List<Transaction> transactions = new List<Transaction>();   
                     foreach (var transferTo in transferDto.ToAccounts)
                     {
                         var toAccount = await GetAccount(transferTo.Id);
-                        if (toAccount == null)
-                        {
-                            throw new Exception($"The Account not found, account id:{transferTo.Id}");
-                        }
-                        AddCredit(toAccount, transferTo.Amount );
+
+                        ValidateAccount(toAccount, transferTo.Id);
+
+                        AddCredit(toAccount!, transferTo.Amount );
 
                         var toTrn = new Transaction
                         {
@@ -122,7 +136,8 @@ namespace BankingSystem.Services
                             TrnOn = DateTime.UtcNow
 
                         };
-                        toAccount.Transactions.Add(toTrn);
+
+                        toAccount!.Transactions.Add(toTrn);
 
 
                         transactions.Add( toTrn );
@@ -169,11 +184,13 @@ namespace BankingSystem.Services
                 {
                     var account = await GetAccount(depositWithdrawalDto.AccountId);
 
-                    AmountLimitCheck(account, depositWithdrawalDto.Amount);
+                    ValidateAccount(account, depositWithdrawalDto.AccountId);
 
-                    AddDebit(account, depositWithdrawalDto.Amount);
+                    AmountLimitCheck(account!, depositWithdrawalDto.Amount);
 
-                    account.Transactions.Add(new Transaction
+                    AddDebit(account!, depositWithdrawalDto.Amount);
+
+                    account!.Transactions.Add(new Transaction
                     {
                         Amount = depositWithdrawalDto.Amount,
                         TrnMethod = TransactionMethod.Withdrawal,
