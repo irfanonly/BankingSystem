@@ -23,8 +23,17 @@ namespace BankingSystem.Services
                 {
                     var account = await GetAccount(depositWithdrawalDto.AccountId);
 
-                    AddCredit(account, depositWithdrawalDto.Amount, TransactionMethod.Deposit);
-                    
+                    AddCredit(account, depositWithdrawalDto.Amount);
+
+                    account.Transactions.Add(new Transaction
+                    {
+                        Amount = depositWithdrawalDto.Amount,
+                        TrnMethod = TransactionMethod.Deposit,
+                        TrnType = TransactionType.Credit,
+                        TrnOn = DateTime.UtcNow
+
+                    });
+
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
@@ -52,32 +61,16 @@ namespace BankingSystem.Services
             }
         }
 
-        private void AddCredit(Account account, decimal amount, string TrnMethod)
+        private void AddCredit(Account account, decimal amount)
         {
             account!.Balance += amount;
-
-            account.Transactions.Add(new Transaction
-            {
-                Amount = amount,
-                TrnMethod = TrnMethod,
-                TrnType = TransactionType.Credit,
-                TrnOn = DateTime.UtcNow
-
-            });
         }
 
-        private void AddDebit(Account account , decimal amount, string TrnMethod)
+        private void AddDebit(Account account , decimal amount)
         {
             account!.Balance -= amount;
 
-            account.Transactions.Add(new Transaction
-            {
-                Amount = amount,
-                TrnMethod = TrnMethod,
-                TrnType = TransactionType.Debit,
-                TrnOn = DateTime.UtcNow
-
-            });
+            
         }
 
         public async Task TransferAsync(TransferDto transferDto)
@@ -86,14 +79,32 @@ namespace BankingSystem.Services
             {
                 try
                 {
+
                     var fromAccount = await GetAccount(transferDto.FromAccountId);
 
                     var total = transferDto.ToAccounts.Sum(x => x.Amount);
 
                     AmountLimitCheck(fromAccount, total);
 
-                    AddDebit(fromAccount, total , TransactionMethod.Transfer );
+                    AddDebit(fromAccount, total);
 
+                    var trn = new Transaction
+                    {
+                        Amount = total,
+                        TrnMethod = TransactionMethod.Transfer,
+                        TrnType = TransactionType.Debit,
+                        TrnOn = DateTime.UtcNow
+
+                    };
+
+                    fromAccount.Transactions.Add(trn);
+
+                    var transfer = new Transfer { Remarks = transferDto.Remarks };
+                    
+
+                    
+
+                    List<Transaction> transactions = new List<Transaction>();   
                     foreach (var transferTo in transferDto.ToAccounts)
                     {
                         var toAccount = await GetAccount(transferTo.Id);
@@ -101,10 +112,38 @@ namespace BankingSystem.Services
                         {
                             throw new Exception($"The Account not found, account id:{transferTo.Id}");
                         }
-                        AddCredit(toAccount, transferTo.Amount, TransactionMethod.Transfer );
+                        AddCredit(toAccount, transferTo.Amount );
+
+                        var toTrn = new Transaction
+                        {
+                            Amount = transferTo.Amount,
+                            TrnMethod = TransactionMethod.Transfer,
+                            TrnType = TransactionType.Credit,
+                            TrnOn = DateTime.UtcNow
+
+                        };
+                        toAccount.Transactions.Add(toTrn);
+
+
+                        transactions.Add( toTrn );
                     }
 
                     await _db.SaveChangesAsync();
+
+
+
+                    // Add transfer seperately to identify
+                    
+
+                    transfer.TransferTransactions.Add(new TransferTransaction { TransactionId = trn.Id });
+                    transactions.ForEach(x =>
+                    {
+                        transfer.TransferTransactions.Add(new TransferTransaction { TransactionId = x.Id });
+                    });
+
+                    await _db.Transfers.AddAsync(transfer);
+                    await _db.SaveChangesAsync();
+
                     await transaction.CommitAsync();
                 }
                 catch (Exception)
@@ -132,7 +171,16 @@ namespace BankingSystem.Services
 
                     AmountLimitCheck(account, depositWithdrawalDto.Amount);
 
-                    AddDebit(account, depositWithdrawalDto.Amount, TransactionMethod.Withdrawal);
+                    AddDebit(account, depositWithdrawalDto.Amount);
+
+                    account.Transactions.Add(new Transaction
+                    {
+                        Amount = depositWithdrawalDto.Amount,
+                        TrnMethod = TransactionMethod.Withdrawal,
+                        TrnType = TransactionType.Debit,
+                        TrnOn = DateTime.UtcNow
+
+                    });
 
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();

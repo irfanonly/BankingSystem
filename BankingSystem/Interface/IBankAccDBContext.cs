@@ -12,7 +12,8 @@ namespace BankingSystem.Interface
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"))
+                .EnableSensitiveDataLogging(); ;
         }
 
         public DbSet<User> Users { get; set; }
@@ -20,13 +21,17 @@ namespace BankingSystem.Interface
         public DbSet<Account> Accounts { get; set; }
         public DbSet<ClosedAccount> ClosedAccounts { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-        //public DbSet<Transfer> Transfers { get; set; }
+        public DbSet<Transfer> Transfers { get; set; }
+        //public DbSet<TransferTransaction> TransferTransactions { get; set; }
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TransferTransaction>()
+            .HasKey(tt => new { tt.TransferId, tt.TransactionId });
 
             modelBuilder.Entity<AccountType>().HasData(
                 new AccountType { Id = 1, Name = "Savings" },

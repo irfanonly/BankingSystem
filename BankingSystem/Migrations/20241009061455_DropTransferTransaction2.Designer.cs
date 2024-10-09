@@ -4,6 +4,7 @@ using BankingSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingSystem.Migrations
 {
     [DbContext(typeof(BankAccDBContext))]
-    partial class BankAccDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241009061455_DropTransferTransaction2")]
+    partial class DropTransferTransaction2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,7 +61,7 @@ namespace BankingSystem.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a6a79820-ee50-47b8-9b18-f169ab035d5d"),
+                            Id = new Guid("0b631537-4973-4805-87ea-9673d84a360d"),
                             AccountTypeId = 1,
                             Balance = 5000.00m,
                             IsClosed = false,
@@ -66,7 +69,7 @@ namespace BankingSystem.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5f5d0d68-47cd-4a16-806b-e48ed2481c06"),
+                            Id = new Guid("8689e2c7-c286-4941-b05b-5e0e634d5a91"),
                             AccountTypeId = 2,
                             Balance = 15000.00m,
                             IsClosed = false,
@@ -74,7 +77,7 @@ namespace BankingSystem.Migrations
                         },
                         new
                         {
-                            Id = new Guid("300aab50-4da6-4ab2-a5d6-f5953cd35e91"),
+                            Id = new Guid("cf85b236-05cf-4b81-82b8-20fcf44bd3e4"),
                             AccountTypeId = 1,
                             Balance = 25000.00m,
                             IsClosed = false,
@@ -111,18 +114,18 @@ namespace BankingSystem.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedOn = new DateTime(2024, 10, 9, 6, 17, 27, 918, DateTimeKind.Utc).AddTicks(5732),
+                            CreatedOn = new DateTime(2024, 10, 9, 6, 14, 55, 587, DateTimeKind.Utc).AddTicks(9560),
                             IsDeleted = false,
                             Name = "Savings",
-                            UpdatedOn = new DateTime(2024, 10, 9, 6, 17, 27, 918, DateTimeKind.Utc).AddTicks(5733)
+                            UpdatedOn = new DateTime(2024, 10, 9, 6, 14, 55, 587, DateTimeKind.Utc).AddTicks(9562)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedOn = new DateTime(2024, 10, 9, 6, 17, 27, 918, DateTimeKind.Utc).AddTicks(5735),
+                            CreatedOn = new DateTime(2024, 10, 9, 6, 14, 55, 587, DateTimeKind.Utc).AddTicks(9565),
                             IsDeleted = false,
                             Name = "Checking",
-                            UpdatedOn = new DateTime(2024, 10, 9, 6, 17, 27, 918, DateTimeKind.Utc).AddTicks(5735)
+                            UpdatedOn = new DateTime(2024, 10, 9, 6, 14, 55, 587, DateTimeKind.Utc).AddTicks(9565)
                         });
                 });
 
@@ -192,46 +195,46 @@ namespace BankingSystem.Migrations
                         new
                         {
                             Id = 1L,
-                            AccountId = new Guid("a6a79820-ee50-47b8-9b18-f169ab035d5d"),
+                            AccountId = new Guid("0b631537-4973-4805-87ea-9673d84a360d"),
                             Amount = 500.00m,
                             TrnMethod = "Deposit",
-                            TrnOn = new DateTime(2024, 10, 9, 10, 17, 27, 918, DateTimeKind.Local).AddTicks(5928),
+                            TrnOn = new DateTime(2024, 10, 9, 10, 14, 55, 587, DateTimeKind.Local).AddTicks(9749),
                             TrnType = "Credit"
                         },
                         new
                         {
                             Id = 2L,
-                            AccountId = new Guid("a6a79820-ee50-47b8-9b18-f169ab035d5d"),
+                            AccountId = new Guid("0b631537-4973-4805-87ea-9673d84a360d"),
                             Amount = 100.00m,
                             TrnMethod = "Withdrawal",
-                            TrnOn = new DateTime(2024, 10, 7, 10, 17, 27, 918, DateTimeKind.Local).AddTicks(5940),
+                            TrnOn = new DateTime(2024, 10, 7, 10, 14, 55, 587, DateTimeKind.Local).AddTicks(9760),
                             TrnType = "Debit"
                         },
                         new
                         {
                             Id = 3L,
-                            AccountId = new Guid("5f5d0d68-47cd-4a16-806b-e48ed2481c06"),
+                            AccountId = new Guid("8689e2c7-c286-4941-b05b-5e0e634d5a91"),
                             Amount = 2000.00m,
                             TrnMethod = "Deposit",
-                            TrnOn = new DateTime(2024, 10, 4, 10, 17, 27, 918, DateTimeKind.Local).AddTicks(5946),
+                            TrnOn = new DateTime(2024, 10, 4, 10, 14, 55, 587, DateTimeKind.Local).AddTicks(9766),
                             TrnType = "Credit"
                         },
                         new
                         {
                             Id = 4L,
-                            AccountId = new Guid("300aab50-4da6-4ab2-a5d6-f5953cd35e91"),
+                            AccountId = new Guid("cf85b236-05cf-4b81-82b8-20fcf44bd3e4"),
                             Amount = 5000.00m,
                             TrnMethod = "Deposit",
-                            TrnOn = new DateTime(2024, 9, 9, 10, 17, 27, 918, DateTimeKind.Local).AddTicks(5948),
+                            TrnOn = new DateTime(2024, 9, 9, 10, 14, 55, 587, DateTimeKind.Local).AddTicks(9768),
                             TrnType = "Credit"
                         },
                         new
                         {
                             Id = 5L,
-                            AccountId = new Guid("300aab50-4da6-4ab2-a5d6-f5953cd35e91"),
+                            AccountId = new Guid("cf85b236-05cf-4b81-82b8-20fcf44bd3e4"),
                             Amount = 3000.00m,
                             TrnMethod = "Deposit",
-                            TrnOn = new DateTime(2024, 8, 9, 10, 17, 27, 918, DateTimeKind.Local).AddTicks(5984),
+                            TrnOn = new DateTime(2024, 8, 9, 10, 14, 55, 587, DateTimeKind.Local).AddTicks(9772),
                             TrnType = "Credit"
                         });
                 });
@@ -354,7 +357,7 @@ namespace BankingSystem.Migrations
                         .IsRequired();
 
                     b.HasOne("BankingSystem.Data.Transfer", "Transfer")
-                        .WithMany("TransferTransactions")
+                        .WithMany()
                         .HasForeignKey("TransferId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -367,11 +370,6 @@ namespace BankingSystem.Migrations
             modelBuilder.Entity("BankingSystem.Data.Account", b =>
                 {
                     b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("BankingSystem.Data.Transfer", b =>
-                {
-                    b.Navigation("TransferTransactions");
                 });
 #pragma warning restore 612, 618
         }

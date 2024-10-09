@@ -9,6 +9,8 @@ namespace BankingSystem.Dtos
         [Required]
         public IList<TransferToAccount> ToAccounts { get; set; }
 
+        public string? Remarks { get; set; }
+
     }
 
     public class TransferToAccount
