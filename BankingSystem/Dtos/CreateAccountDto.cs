@@ -12,6 +12,11 @@ namespace BankingSystem.Dtos
         public string Name { get; set; }
         [Range(0.01, (double)decimal.MaxValue)]
         public decimal? OverDraftLimit { get; set; }
+
+        public override string ToString()
+        {
+            return $"AccountTypeId: {AccountTypeId}, Name: {Name}, OverDraftLimit: {OverDraftLimit?.ToString() ?? "N/A"}";
+        }
     }
 
 

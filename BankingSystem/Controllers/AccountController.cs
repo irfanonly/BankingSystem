@@ -12,22 +12,27 @@ namespace BankingSystem.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService)
+        private readonly ILogger<AccountController> _logger;    
+        public AccountController(IAccountService accountService, ILogger<AccountController> logger)
         {
             _accountService = accountService;
+            _logger = logger;
         }
 
         [HttpPost]
         [Route("create")]
         public async Task<IActionResult> Create(CreateAccountDto account)
         {
+            _logger.LogInformation($"Account create request recieved, payload: {account?.ToString()}");
             if (ModelState.IsValid)
             {
-                var Id = await _accountService.CreateAsync(account);
+                var Id = await _accountService.CreateAsync(account!);
 
+                _logger.LogInformation($"Account Successfully Created {Id}");
                 return Created(Url.Action("Details"), new { id = Id });
             }
 
+            _logger.LogInformation($"Invalid request");
             return BadRequest("Invalid request");
         }
 
@@ -35,11 +40,8 @@ namespace BankingSystem.Controllers
         [Route("view")]
         public async Task<IActionResult> View(Guid Id)
         {
+            _logger.LogInformation($"Account view requested, Id: {Id}");
             var account = await _accountService.GetDtoAsync(Id);
-            if (account == null)
-            {
-                return NotFound();
-            }
 
             return Ok(account);
         }
@@ -48,13 +50,9 @@ namespace BankingSystem.Controllers
         [HttpPut("close/{Id}")]
         public async Task<IActionResult> Close(Guid Id)
         {
-            var account = await _accountService.GetAsync(Id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-
-            await _accountService.CloseAsync(account);
+            _logger.LogInformation($"Account closure requested, Id: {Id}");
+            
+            await _accountService.CloseAsync(Id);
 
             return NoContent();
         }

@@ -18,37 +18,6 @@ namespace BankingSystem.Services
             _mapper = mapper;
         }
 
-        public async Task CloseAsync(Account account)
-        {
-
-            using (var transaction = _db.Database.BeginTransaction()) {
-
-                try
-                {
-                    account.IsClosed = true;
-
-                    var closed = new ClosedAccount
-                    {
-                        AccountId = account.Id,
-                        ClosedOn = DateTime.UtcNow,
-                    };
-
-                    await _db.ClosedAccounts.AddAsync(closed);
-
-                    await _db.SaveChangesAsync();
-                    transaction.Commit();
-                }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-                
-
-            }
-            
-
-        }
 
 
 
@@ -84,24 +53,25 @@ namespace BankingSystem.Services
         {
             var account =  await _db.Accounts.Include(x => x.Transactions).Include(x => x.AccountType).FirstOrDefaultAsync(x => x.Id == id);
 
-            if (account != null) {
-                return new AccountDto
-                {
-                    Name = account.Name,
-                    AccountTypeName = account.AccountType.Name,
-                    Balance = account.Balance,
-                    Id = account.Id,
-                    Transactions = account.Transactions?.TakeLast(10)?.Select(x => new TransactionDto
-                    {
-                        Amount = x.Amount,
-                        TrnMethod = x.TrnMethod,
-                        TrnType = x.TrnType,
-                    }).ToList()
-                };
+            if (account == null) {
+                throw new NotFoundException($"The account is not found, Id: {id}");
             }
 
-            return null;
-            
+
+            return new AccountDto
+            {
+                Name = account.Name,
+                AccountTypeName = account.AccountType.Name,
+                Balance = account.Balance,
+                Id = account.Id,
+                Transactions = account.Transactions?.TakeLast(10)?.Select(x => new TransactionDto
+                {
+                    Amount = x.Amount,
+                    TrnMethod = x.TrnMethod,
+                    TrnType = x.TrnType,
+                }).ToList()
+            };
+
 
         }
 
@@ -110,6 +80,40 @@ namespace BankingSystem.Services
             return await _db.Accounts.FindAsync( id);
         }
 
-        
+        public async Task CloseAsync(Guid Id)
+        {
+            using (var transaction = _db.Database.BeginTransaction())
+            {
+                var account = _db.Accounts.FirstOrDefault(x => x.Id == Id);
+
+                if (account == null) {
+                    throw new NotFoundException("The account is not found");
+                }
+
+                try
+                {
+                    account.IsClosed = true;
+
+                    var closed = new ClosedAccount
+                    {
+                        AccountId = account.Id,
+                        ClosedOn = DateTime.UtcNow,
+                    };
+
+                    await _db.ClosedAccounts.AddAsync(closed);
+
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+
+
+            }
+
+        }
     }
 }
