@@ -11,22 +11,29 @@ namespace BankingSystem.Controllers
     public class AccountTypeController : ControllerBase
     {
         private readonly IAccountTypeService _accountTypeService;
-        public AccountTypeController(IAccountTypeService accountTypeService)
+        private readonly Logger<AccountTypeController> _logger;
+        public AccountTypeController(IAccountTypeService accountTypeService,Logger<AccountTypeController> logger)
         {
             _accountTypeService = accountTypeService;
+            _logger = logger;
         }
 
         // POST: api/AccountType
         [HttpPost]
-        public async Task<IActionResult> Create(CreateAccountTypeDto account)
+        public async Task<IActionResult> Create(CreateAccountTypeDto accountType)
         {
+            _logger.LogInformation($"Account type create request recieved, payload: {accountType?.ToString()}");
+
             if (ModelState.IsValid)
             {
-                var Id = await _accountTypeService.CreateAsync(account);
+                var Id = await _accountTypeService.CreateAsync(accountType!);
 
-                return CreatedAtAction(nameof(GetAccountType), new { id = Id }, account);
+                _logger.LogInformation($"The account type created successfully, account type id:{Id}");
+
+                return CreatedAtAction(nameof(GetAccountType), new { id = Id }, accountType);
             }
 
+            _logger.LogInformation($"Invalid request, payload: {accountType?.ToString()}");
             return BadRequest("Invalid request");
         }
 
@@ -34,21 +41,17 @@ namespace BankingSystem.Controllers
         [HttpGet]
         public async Task<IEnumerable<AccountType>> GetAccountTypes()
         {
+            _logger.LogInformation($"GetAccountTypes request recieved");
             return await _accountTypeService.GetAsync();
         }
 
         // GET: api/AccountType/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AccountType>> GetAccountType(int id)
+        public async Task<AccountType?> GetAccountType(int id)
         {
-            var accountType = await _accountTypeService.GetAsync(id);
+            _logger.LogInformation($"GetAccountType request recieved, Id:{id}");
+            return await _accountTypeService.GetAsync(id);
 
-            if (accountType == null)
-            {
-                return NotFound();
-            }
-
-            return accountType;
         }
 
 
@@ -56,21 +59,15 @@ namespace BankingSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAccountType(int id, UpdateAccountTypeDto accountType)
         {
-            if (id != accountType.Id)
+            _logger.LogInformation($"UpdateAccountType request recieved, payload:{accountType?.ToString()},Id:{id}");
+            if (accountType == null|| id != accountType.Id || !ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var existingAccountType = await _accountTypeService.GetAsync(id);
-            if (existingAccountType == null)
-            {
-                return NotFound();
-            }
+            await _accountTypeService.UpdateAsync(accountType);
 
-            await _accountTypeService.UpdateAsync(existingAccountType, accountType);
-
-            
-
+            _logger.LogInformation($"AccountType is updated, Id: {id}");
             return NoContent();
         }
 
@@ -78,13 +75,10 @@ namespace BankingSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAccountType(int id)
         {
-            var accountType = await _accountTypeService.GetAsync(id);
-            if (accountType == null)
-            {
-                return NotFound();
-            }
+            _logger.LogInformation($"AccountType delete request recieved, Id: {id}");
+            await _accountTypeService.DeleteAsync(id);
 
-            await _accountTypeService.DeleteAsync(accountType);
+            _logger.LogInformation($"AccountType is deleted, Id: {id}");
 
             return NoContent();
         }

@@ -8,8 +8,9 @@ namespace BankingSystem.Interface
     {
         Task<int> CreateAsync(CreateAccountTypeDto account);
         Task DeleteAsync(AccountType accountType);
+        Task DeleteAsync(int id);
         Task<IEnumerable<AccountType>> GetAsync();
         Task<AccountType?> GetAsync(int Id);
-        Task UpdateAsync(AccountType existingAccountType, UpdateAccountTypeDto newAccountType);
+        Task UpdateAsync(UpdateAccountTypeDto newAccountType);
     }
 }
