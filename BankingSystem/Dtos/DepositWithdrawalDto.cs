@@ -6,7 +6,7 @@ namespace BankingSystem.Dtos
     {
         [Required]
         public Guid AccountId { get; set; }
-        [Range(0.0, (double)decimal.MaxValue)]
+        [Range(0.01, (double)decimal.MaxValue)]
         [Required]
         public decimal Amount { get; set; }
     }

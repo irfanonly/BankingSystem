@@ -9,7 +9,9 @@ namespace BankingSystem.Dtos
         [Required]
         public int AccountTypeId { get; set; }
         [Required]
-        public string AccountName { get; set; }
+        public string Name { get; set; }
+        [Range(0.01, (double)decimal.MaxValue)]
+        public decimal? OverDraftLimit { get; set; }
     }
 
 

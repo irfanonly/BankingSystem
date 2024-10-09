@@ -17,19 +17,19 @@ namespace BankingSystem.Controllers
             _accountService = accountService;
         }
 
-        //[HttpPost]
-        //[Route("create")]
-        //public async Task<IActionResult> Create(CreateAccountDto account)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var Id = await _accountService.CreateAsync(account);
+        [HttpPost]
+        [Route("create")]
+        public async Task<IActionResult> Create(CreateAccountDto account)
+        {
+            if (ModelState.IsValid)
+            {
+                var Id = await _accountService.CreateAsync(account);
 
-        //        return Created(Url.Action("Details"), new { id = Id });
-        //    }
+                return Created(Url.Action("Details"), new { id = Id });
+            }
 
-        //    return BadRequest("Invalid request");
-        //}
+            return BadRequest("Invalid request");
+        }
 
         [HttpGet]
         [Route("view")]

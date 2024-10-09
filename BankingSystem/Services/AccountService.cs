@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BankingSystem.Data;
 using BankingSystem.Dtos;
+using BankingSystem.Exceptions;
 using BankingSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,26 @@ namespace BankingSystem.Services
 
         public async Task<Guid> CreateAsync(CreateAccountDto account)
         {
+            var accountType = await _db.AccountTypes.FindAsync(account.AccountTypeId);
+            if (accountType == null)
+            {
+                throw new NotFoundException($"The account type is not exists, AccountTypeId: {account.AccountTypeId}");
+            }
+
+            if (accountType.Name == AccountType.Checking)
+            {
+                if (account.OverDraftLimit == null)
+                {
+                    throw new BadRequestException("The overdraft limit is required");
+                }
+            }
+            // assumption: OverDraftLimit is applicable only for Checking account
+            else if (account.OverDraftLimit != null)
+            {
+                throw new BadRequestException($"The overdraft limit is not applicable for {accountType.Name}");
+
+            }
+
             var newAccount = _mapper.Map<Account>(account);
             _db.Accounts.Add(newAccount);
             await _db.SaveChangesAsync();
