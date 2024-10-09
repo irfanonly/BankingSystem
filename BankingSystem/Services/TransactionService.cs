@@ -39,9 +39,9 @@ namespace BankingSystem.Services
 
                     ValidateAccount(account, depositWithdrawalDto.AccountId);
 
-                    AddCredit(account, depositWithdrawalDto.Amount);
+                    AddCredit(account!, depositWithdrawalDto.Amount);
 
-                    account.Transactions.Add(new Transaction
+                    account!.Transactions.Add(new Transaction
                     {
                         Amount = depositWithdrawalDto.Amount,
                         TrnMethod = TransactionMethod.Deposit,

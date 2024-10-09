@@ -1,4 +1,5 @@
 ﻿using BankingSystem.Exceptions;
+using System.Data;
 
 namespace BankingSystem.Middlewares
 {
@@ -28,6 +29,13 @@ namespace BankingSystem.Middlewares
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+            }
+            catch(DBConcurrencyException ex)
+            {
+                // TODO: Retry mechnism should be implemented if concurrecy occurs
+                _logger.LogError(ex, "An unexpected error occurred.");
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new { message = "Concurrency exception happen. Please try again." });
             }
             catch (Exception ex)
             {
