@@ -13,10 +13,4 @@ namespace BankingSystem.Dtos
 
     }
 
-    public class TransferToAccount
-    {
-        public Guid Id { get; set; }
-        public decimal Amount { get; set; }
-    }
-
 }

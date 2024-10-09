@@ -22,15 +22,7 @@ namespace BankingSystem.Controllers
         public async Task<IActionResult> Deposit(DepositWithdrawalDto depositWithdrawalDto)
         {
             if (ModelState.IsValid) {
-                //var account = await _accountService.GetAsync(depositWithdrawalDto.AccountId);
-                //if (account == null)
-                //{
-                //    return NotFound();
-                //}
-                //if (account.IsClosed)
-                //{
-                //    return BadRequest("The account is closed");
-                //}
+
 
                 await _transactionService.DepositAsync(depositWithdrawalDto);
 
@@ -49,17 +41,6 @@ namespace BankingSystem.Controllers
             if (!ModelState.IsValid) { 
                 return BadRequest();
             }
-
-            //var account = await _accountService.GetAsync(depositWithdrawalDto.AccountId);
-            //if (account == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //if (account.IsClosed)
-            //{
-            //    return BadRequest("The account is closed");
-            //}
            
             await _transactionService.WithdrawalAsync(depositWithdrawalDto);
 
