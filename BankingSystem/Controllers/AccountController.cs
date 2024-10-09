@@ -29,7 +29,7 @@ namespace BankingSystem.Controllers
                 var Id = await _accountService.CreateAsync(account!);
 
                 _logger.LogInformation($"Account Successfully Created {Id}");
-                return Created(Url.Action("Details"), new { id = Id });
+                return CreatedAtAction(nameof(View), new { id = Id });
             }
 
             _logger.LogInformation($"Invalid request");
