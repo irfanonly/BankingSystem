@@ -28,6 +28,5 @@ Some additional features and improvements that are planned for future developmen
 
 - Authentication
 - Authorization
-- Logging - Partially implemented
 - Interest Calculation
 - Unit Test
