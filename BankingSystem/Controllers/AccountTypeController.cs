@@ -11,8 +11,8 @@ namespace BankingSystem.Controllers
     public class AccountTypeController : ControllerBase
     {
         private readonly IAccountTypeService _accountTypeService;
-        private readonly Logger<AccountTypeController> _logger;
-        public AccountTypeController(IAccountTypeService accountTypeService,Logger<AccountTypeController> logger)
+        private readonly ILogger<AccountTypeController> _logger;
+        public AccountTypeController(IAccountTypeService accountTypeService,ILogger<AccountTypeController> logger)
         {
             _accountTypeService = accountTypeService;
             _logger = logger;

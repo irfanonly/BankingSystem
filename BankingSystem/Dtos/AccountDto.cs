@@ -7,6 +7,7 @@
         public decimal Balance { get; set; }
         public List<TransactionDto>? Transactions { get; set; }
         public string AccountTypeName { get; set; }
+        public bool IsClosed { get; set; }
     }
 
 }
