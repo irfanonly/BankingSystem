@@ -10,10 +10,16 @@ namespace BankingSystem.Services
 {
     public class TransactionService : ITransactionService
     {
-        private readonly IBankAccDBContext _db;
-        public TransactionService(IBankAccDBContext db)
+        private readonly IGenericRepository<Transaction> _db;
+        private readonly IGenericRepository<Transfer> _dbTrans;
+        private readonly IGenericRepository<Account> _dbAccount;
+        public TransactionService(IGenericRepository<Transaction> db,
+            IGenericRepository<Transfer> dbTrans,
+            IGenericRepository<Account> dbAccount)
         {
             _db = db;
+            _dbTrans = dbTrans;
+            _dbAccount = dbAccount;
         }
 
         private void ValidateAccount(Account? account, Guid id)
@@ -31,7 +37,7 @@ namespace BankingSystem.Services
 
         public async Task DepositAsync(DepositWithdrawalDto depositWithdrawalDto)
         {
-            using (var transaction = _db.Database.BeginTransaction())
+            using (var transaction = await _db.BeginTransactionAsync())
             {
                 try
                 {
@@ -91,7 +97,7 @@ namespace BankingSystem.Services
 
         public async Task TransferAsync(TransferDto transferDto)
         {
-            using (var transaction = _db.Database.BeginTransaction())
+            using (var transaction = await _db.BeginTransactionAsync())
             {
                 try
                 {
@@ -156,7 +162,7 @@ namespace BankingSystem.Services
                         transfer.TransferTransactions.Add(new TransferTransaction { TransactionId = x.Id });
                     });
 
-                    await _db.Transfers.AddAsync(transfer);
+                    await _dbTrans.AddAsync(transfer);
                     await _db.SaveChangesAsync();
 
                     await transaction.CommitAsync();
@@ -172,13 +178,14 @@ namespace BankingSystem.Services
 
         private async Task<Account?> GetAccount(Guid Id)
         {
-            return await _db.Accounts.Include(x => x.Transactions)
-                        .Include(x => x.AccountType)
-                        .FirstOrDefaultAsync(x => x.Id == Id);
+            var accounts = await _dbAccount.GetWithIncludeAsync(x => x.Transactions, x => x.AccountType);
+
+
+            return accounts.FirstOrDefault(x => x.Id == Id);
         }
         public async Task WithdrawalAsync(DepositWithdrawalDto depositWithdrawalDto)
         {
-            using (var transaction = _db.Database.BeginTransaction())
+            using (var transaction = await _db.BeginTransactionAsync())
             {
                 try
                 {
