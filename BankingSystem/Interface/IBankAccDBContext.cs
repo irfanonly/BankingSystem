@@ -1,4 +1,5 @@
-﻿using BankingSystem.Data;
+﻿using BankingSystem.Constants;
+using BankingSystem.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankingSystem.Interface
@@ -36,6 +37,12 @@ namespace BankingSystem.Interface
             modelBuilder.Entity<AccountType>().HasData(
                 new AccountType { Id = 1, Name = "Savings" },
                 new AccountType { Id = 2, Name = "Checking" }
+            );
+
+
+            modelBuilder.Entity<User>().HasData(
+                new User { Id= Guid.NewGuid(),  Email = "admin@bk.ae", Password="123" , Role = UserRole.Admin },
+                new User { Id = Guid.NewGuid(), Email = "test@bk.ae" , Password= "123", Role = UserRole.Customer }
             );
 
 
