@@ -10,12 +10,17 @@ namespace BankingSystem.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IBankAccDBContext _db;
+        private readonly IGenericRepository<Account> _db;
+        private readonly IGenericRepository<AccountType> _dbType;
+        private readonly IGenericRepository<ClosedAccount> _dbClosed;
         private readonly IMapper _mapper;
-        public AccountService(IBankAccDBContext db, IMapper mapper)
+        public AccountService(IGenericRepository<Account> db, IMapper mapper,
+            IGenericRepository<AccountType> dbType, IGenericRepository<ClosedAccount> dbClosed)
         {
             _db = db;
             _mapper = mapper;
+            _dbType = dbType;
+            _dbClosed = dbClosed;
         }
 
 
@@ -23,7 +28,7 @@ namespace BankingSystem.Services
 
         public async Task<Guid> CreateAsync(CreateAccountDto account)
         {
-            var accountType = await _db.AccountTypes.FindAsync(account.AccountTypeId);
+            var accountType = await _dbType.FindAsync(account.AccountTypeId);
             if (accountType == null)
             {
                 throw new NotFoundException($"The account type is not exists, AccountTypeId: {account.AccountTypeId}");
@@ -44,14 +49,16 @@ namespace BankingSystem.Services
             }
 
             var newAccount = _mapper.Map<Account>(account);
-            _db.Accounts.Add(newAccount);
+            await _db.AddAsync(newAccount);
             await _db.SaveChangesAsync();
             return newAccount.Id;
         }
 
         public async Task<AccountDto?> GetDtoAsync(Guid id)
         {
-            var account =  await _db.Accounts.Include(x => x.Transactions).Include(x => x.AccountType).FirstOrDefaultAsync(x => x.Id == id);
+            var accounts =  await _db.GetWithIncludeAsync(x => x.Transactions, x => x.AccountType);
+
+            var account = accounts?.FirstOrDefault();
 
             if (account == null) {
                 throw new NotFoundException($"The account is not found, Id: {id}");
@@ -64,6 +71,7 @@ namespace BankingSystem.Services
                 AccountTypeName = account.AccountType.Name,
                 Balance = account.Balance,
                 Id = account.Id,
+                IsClosed = account.IsClosed,
                 Transactions = account.Transactions?.TakeLast(10)?.Select(x => new TransactionDto
                 {
                     Amount = x.Amount,
@@ -77,14 +85,14 @@ namespace BankingSystem.Services
 
         public async Task<Account?> GetAsync(Guid id)
         {
-            return await _db.Accounts.FindAsync( id);
+            return await _db.FindAsync( id);
         }
 
         public async Task CloseAsync(Guid Id)
         {
-            using (var transaction = _db.Database.BeginTransaction())
+            using (var transaction = await _db.BeginTransactionAsync())
             {
-                var account = _db.Accounts.FirstOrDefault(x => x.Id == Id);
+                var account = await _db.GetByIdAsync(Id);
 
                 if (account == null) {
                     throw new NotFoundException("The account is not found");
@@ -100,7 +108,7 @@ namespace BankingSystem.Services
                         ClosedOn = DateTime.UtcNow,
                     };
 
-                    await _db.ClosedAccounts.AddAsync(closed);
+                    await _dbClosed.AddAsync(closed);
 
                     await _db.SaveChangesAsync();
                     transaction.Commit();

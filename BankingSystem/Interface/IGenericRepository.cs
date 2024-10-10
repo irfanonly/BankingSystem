@@ -10,6 +10,8 @@ namespace BankingSystem.Interface
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         Task<T?> FindAsync(object id);
         bool Any(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> GetWithIncludeAsync(params Expression<Func<T, object>>[] includes);
+        Task<IEnumerable<T>> FindWithIncludeAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
         Task AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         void Update(T entity);
