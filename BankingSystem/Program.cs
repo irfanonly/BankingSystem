@@ -1,6 +1,7 @@
 using BankingSystem.Data;
 using BankingSystem.Interface;
 using BankingSystem.Middlewares;
+using BankingSystem.Repositories;
 using BankingSystem.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,8 @@ builder.Services.AddScoped<IBankAccDBContext, BankAccDBContext>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountTypeService, AccountTypeService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
