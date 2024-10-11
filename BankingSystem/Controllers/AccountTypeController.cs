@@ -1,6 +1,7 @@
 ﻿using BankingSystem.Data;
 using BankingSystem.Dtos;
 using BankingSystem.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace BankingSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountTypeController : ControllerBase
     {
         private readonly IAccountTypeService _accountTypeService;
