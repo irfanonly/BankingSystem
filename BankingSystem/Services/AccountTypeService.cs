@@ -46,15 +46,6 @@ namespace BankingSystem.Services
 
         }
 
-        public async Task DeleteAsync(AccountType accountType)
-        {
-            
-            accountType.IsDeleted = true;
-            accountType.UpdatedOn = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
-            
-        }
 
         public async Task<IEnumerable<AccountType>> GetAsync()
         {
@@ -87,11 +78,5 @@ namespace BankingSystem.Services
             await _db.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(AccountType existingAccountType, UpdateAccountTypeDto newAccountType)
-        {
-            existingAccountType.UpdatedOn = DateTime.UtcNow;
-            existingAccountType.Name = newAccountType.Name;
-            await _db.SaveChangesAsync();
-        }
     }
 }

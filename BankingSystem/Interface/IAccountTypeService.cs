@@ -7,7 +7,6 @@ namespace BankingSystem.Interface
     public interface IAccountTypeService
     {
         Task<int> CreateAsync(CreateAccountTypeDto account);
-        Task DeleteAsync(AccountType accountType);
         Task DeleteAsync(int id);
         Task<IEnumerable<AccountType>> GetAsync();
         Task<AccountType?> GetAsync(int Id);
