@@ -26,7 +26,7 @@ The necessary account types and some sample accounts will be seeded automaticall
 ## To-Do List
 Some additional features and improvements that are planned for future development include:
 
-- Authentication
-- Authorization
+- Authentication (Newly Updated)
+- Authorization  (Newly Updated)
 - Interest Calculation
 - Unit Test
