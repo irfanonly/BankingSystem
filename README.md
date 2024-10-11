@@ -5,9 +5,9 @@
 - **Overdraft Limit**: The overdraft limit is applicable only to checking type accounts.
 - **Account ID**: The application uses a `GUID` as the account ID. In a real-world scenario, it would likely be a formatted string.
 
-## Concurrcy 
-- ** concurrency addressed using transaction + RowVersion on the account table
-- ** From the concurrency excception, we can implemnt retry mechanism (not implemented)
+## Features 
+-  Concurrency addressed using transaction + RowVersion on the account table, DBconcurrecy exception will be thrown if mutiple entries tryinf to update same value
+-  Exception is handled on Middleware to make sure cleaner code
 
 ## Run the Application
 
